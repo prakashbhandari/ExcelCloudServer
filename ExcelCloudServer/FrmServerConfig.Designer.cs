@@ -1,6 +1,6 @@
 ﻿namespace ExcelCloudServer
 {
-    partial class Form1
+    partial class FrmServerConfig
     {
         /// <summary>
         /// Required designer variable.
@@ -32,7 +32,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.hostIP = new System.Windows.Forms.TextBox();
             this.serverStart = new System.Windows.Forms.Button();
-            this.status = new System.Windows.Forms.Label();
+            this.lblNotification = new System.Windows.Forms.Label();
             this.servicePort = new System.Windows.Forms.NumericUpDown();
             this.serverStop = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.servicePort)).BeginInit();
@@ -73,14 +73,14 @@
             this.serverStart.UseVisualStyleBackColor = true;
             this.serverStart.Click += new System.EventHandler(this.serverStart_Click);
             // 
-            // status
+            // lblNotification
             // 
-            this.status.AutoSize = true;
-            this.status.Location = new System.Drawing.Point(12, 39);
-            this.status.Name = "status";
-            this.status.Size = new System.Drawing.Size(134, 13);
-            this.status.TabIndex = 6;
-            this.status.Text = "Please enter Host and Port";
+            this.lblNotification.AutoSize = true;
+            this.lblNotification.Location = new System.Drawing.Point(12, 39);
+            this.lblNotification.Name = "lblNotification";
+            this.lblNotification.Size = new System.Drawing.Size(134, 13);
+            this.lblNotification.TabIndex = 6;
+            this.lblNotification.Text = "Please enter Host and Port";
             // 
             // servicePort
             // 
@@ -123,7 +123,7 @@
             this.ClientSize = new System.Drawing.Size(284, 261);
             this.Controls.Add(this.serverStop);
             this.Controls.Add(this.servicePort);
-            this.Controls.Add(this.status);
+            this.Controls.Add(this.lblNotification);
             this.Controls.Add(this.serverStart);
             this.Controls.Add(this.hostIP);
             this.Controls.Add(this.label2);
@@ -142,7 +142,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox hostIP;
         private System.Windows.Forms.Button serverStart;
-        private System.Windows.Forms.Label status;
+        private System.Windows.Forms.Label lblNotification;
         private System.Windows.Forms.NumericUpDown servicePort;
         private System.Windows.Forms.Button serverStop;
     }
