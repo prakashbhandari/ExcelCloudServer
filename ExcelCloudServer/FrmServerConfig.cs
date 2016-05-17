@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,7 +9,6 @@ namespace ExcelCloudServer
     public partial class FrmServerConfig : Form
     {
         private AsyncConnection server;
-        private Thread asyncConnectionThread;
 
         public FrmServerConfig()
         {
@@ -23,12 +21,11 @@ namespace ExcelCloudServer
 
             this.server = new AsyncConnection(this.hostIP.Text, port);
 
-            if(this.isFrmValid())
+            if (this.IsFrmValid())
             {
-                // Send status update message
-                this.updateStatus(3);
-                this.asyncConnectionThread = new Thread(new ThreadStart(this.server.StartListening));
-                this.asyncConnectionThread.Start();
+                // Set status update message to server started
+                this.UpdateStatus(3);
+                Program.LoadServer(this.server);
             }
         }
 
@@ -36,31 +33,32 @@ namespace ExcelCloudServer
         {
             // Close any active connection
             this.server.StopListening();
-            // Stop listening to the port
-            this.asyncConnectionThread.Abort();
-            this.asyncConnectionThread.Join();
-            this.updateStatus(4);
+            this.UpdateStatus(4);
+            Program.CloseServer();
         }
 
-        public bool isFrmValid()
+        public bool IsFrmValid()
         {
             IPAddress ipAddress;
             if (this.hostIP.Text == String.Empty)
             {
-                updateStatus(0);
+                UpdateStatus(0);
+                return false;
             }
             else if (!IPAddress.TryParse(this.hostIP.Text, out ipAddress))
             {
-                updateStatus(1);
+                UpdateStatus(1);
+                return false;
             }
-            else if (!this.server.isPortAvailable())
+            else if (!this.server.IsPortAvailable())
             {
-                updateStatus(2);
+                UpdateStatus(2);
+                return false;
             }
             return true;
         }
 
-        public void updateStatus(int status)
+        public void UpdateStatus(int status)
         {
             switch (status)
             {
