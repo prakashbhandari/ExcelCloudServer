@@ -32,6 +32,36 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Aneka">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Manjrasoft\Aneka.3.1\Tools\SDK\Common\Aneka.dll</HintPath>
+    </Reference>
+    <Reference Include="Aneka.Data">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Manjrasoft\Aneka.3.1\Tools\SDK\Task Model\Aneka.Data.DLL</HintPath>
+    </Reference>
+    <Reference Include="Aneka.Execution">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Manjrasoft\Aneka.3.1\Tools\SDK\Runtime\Aneka.Execution.dll</HintPath>
+    </Reference>
+    <Reference Include="Aneka.Runtime.Common">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Manjrasoft\Aneka.3.1\Tools\SDK\Runtime\Aneka.Runtime.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Aneka.Runtime.Provisioning">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Manjrasoft\Aneka.3.1\Tools\SDK\Runtime\Aneka.Runtime.Provisioning.dll</HintPath>
+    </Reference>
+    <Reference Include="Aneka.Scheduling">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Manjrasoft\Aneka.3.1\Tools\SDK\Runtime\Aneka.Scheduling.dll</HintPath>
+    </Reference>
+    <Reference Include="Aneka.Tasks">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Manjrasoft\Aneka.3.1\Tools\SDK\Task Model\Aneka.Tasks.dll</HintPath>
+    </Reference>
+    <Reference Include="Aneka.Threading">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Manjrasoft\Aneka.3.1\Tools\SDK\Thread Model\Aneka.Threading.dll</HintPath>
+    </Reference>
+    <Reference Include="Aneka.UI.Common">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Manjrasoft\Aneka.3.1\Tools\SDK\Common\Aneka.UI.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Aneka.Util">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Manjrasoft\Aneka.3.1\Tools\SDK\Task Model\Aneka.Util.DLL</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.8.0.3\lib\net20\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -44,6 +74,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnekaExecutor.cs" />
     <Compile Include="AsyncConnection.cs" />
     <Compile Include="FrmServerConfig.cs">
       <SubType>Form</SubType>

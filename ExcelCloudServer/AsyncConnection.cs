@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 
 namespace ExcelCloudServer
@@ -70,7 +69,7 @@ namespace ExcelCloudServer
                 {
                     connectDone.Reset();
 
-                    Debug.WriteLine("Waiting for connection at "+ ipAddress.ToString() + ":"+ this.port.ToString());
+                    Debug.WriteLine("Waiting for connection at " + ipAddress.ToString() + ":" + this.port.ToString());
                     listener.BeginAccept(new AsyncCallback(AcceptCallBack), listener);
 
                     // Wait until a connection is made before continuing
@@ -99,7 +98,7 @@ namespace ExcelCloudServer
                 state.workSocket = handler;
                 handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallBack), state);
             }
-            catch(ObjectDisposedException ode)
+            catch (ObjectDisposedException ode)
             {
                 Debug.WriteLine("Listener has been closed");
             }
@@ -121,16 +120,12 @@ namespace ExcelCloudServer
                 if (this.content.IndexOf("EOF") > -1)
                 {
                     this.content = this.content.Remove(content.IndexOf("EOF"), "EOF".Length);
-                    Debug.WriteLine("All Data Received: "+ this.content + " \nRunning Task Now.");
+                    Debug.WriteLine("All Data Received: " + this.content + " \nRunning Task Now.");
                     try
                     {
-                        JObject taskQuery = JObject.Parse(@content);
-                        string task = (string)taskQuery["task"];
-                        JArray allParams = (JArray)taskQuery["inputParams"];
-                        string[] paramList = allParams.ToObject<string[]>();
-
-                        //string values = (string)taskQuery["inputParams"];
-                        //TaskExec.execTask(task, paramList);
+                        Job job = new Job();
+                        job.PrepareBagOfTasks(content);
+                        job.SubmitTasks();
                     }
                     catch (Exception e)
                     {
@@ -162,7 +157,7 @@ namespace ExcelCloudServer
 
                 // Complete sending data to client
                 int bytesSent = handler.EndSend(ar);
-                Debug.WriteLine("Sent "+ bytesSent.ToString() + " bytes to client");
+                Debug.WriteLine("Sent " + bytesSent.ToString() + " bytes to client");
                 sendDone.Set();
             }
             catch (Exception e)
