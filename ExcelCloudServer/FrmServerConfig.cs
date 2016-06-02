@@ -24,7 +24,7 @@ namespace ExcelCloudServer
             if (this.IsFrmValid())
             {
                 // Set status update message to server started
-                this.UpdateStatus(3);
+                this.SetStatus(3);
                 Program.LoadServer(this.server);
             }
         }
@@ -33,7 +33,7 @@ namespace ExcelCloudServer
         {
             // Close any active connection
             this.server.StopListening();
-            this.UpdateStatus(4);
+            this.SetStatus(4);
             Program.CloseServer();
         }
 
@@ -42,23 +42,23 @@ namespace ExcelCloudServer
             IPAddress ipAddress;
             if (this.hostIP.Text == String.Empty)
             {
-                UpdateStatus(0);
+                SetStatus(0);
                 return false;
             }
             else if (!IPAddress.TryParse(this.hostIP.Text, out ipAddress))
             {
-                UpdateStatus(1);
+                SetStatus(1);
                 return false;
             }
             else if (!this.server.IsPortAvailable())
             {
-                UpdateStatus(2);
+                SetStatus(2);
                 return false;
             }
             return true;
         }
 
-        public void UpdateStatus(int status)
+        public void SetStatus(int status)
         {
             switch (status)
             {

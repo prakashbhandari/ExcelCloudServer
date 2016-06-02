@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Newtonsoft.Json;
 using System.Diagnostics;
 
 namespace ExcelCloudServer
@@ -16,7 +17,7 @@ namespace ExcelCloudServer
         protected static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
         public static StateObject state = new StateObject();
-        private String content = String.Empty;
+        private static String content = String.Empty;
         private static Socket listener;
         public volatile bool listening = true;
 
@@ -25,7 +26,6 @@ namespace ExcelCloudServer
             this.host = host;
             this.port = port;
         }
-
 
         public bool IsPortAvailable()
         {
@@ -84,7 +84,7 @@ namespace ExcelCloudServer
             }
         }
 
-        public void AcceptCallBack(IAsyncResult ar)
+        public static void AcceptCallBack(IAsyncResult ar)
         {
             try
             {
@@ -100,11 +100,11 @@ namespace ExcelCloudServer
             }
             catch (ObjectDisposedException ode)
             {
-                Debug.WriteLine("Listener has been closed");
+                Debug.WriteLine("Listener has been closed" + ode.ToString());
             }
         }
 
-        private void ReadCallBack(IAsyncResult ar)
+        private static void ReadCallBack(IAsyncResult ar)
         {
             StateObject state = (StateObject)ar.AsyncState;
             Socket handler = state.workSocket;
@@ -115,17 +115,17 @@ namespace ExcelCloudServer
             if (bytesRead > 0)
             {
                 state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-
-                this.content = state.sb.ToString();
-                if (this.content.IndexOf("EOF") > -1)
+                if (state.sb.ToString().IndexOf("EOF") > -1)
                 {
-                    this.content = this.content.Remove(content.IndexOf("EOF"), "EOF".Length);
-                    Debug.WriteLine("All Data Received: " + this.content + " \nRunning Task Now.");
+                    content = state.sb.ToString();
+                    content = content.Remove(content.IndexOf("EOF"), "EOF".Length);
+                    state.sb = new StringBuilder();
+                    Debug.WriteLine("Received data:" + content);
+                    string data = content;
                     try
                     {
-                        Job job = new Job();
-                        job.PrepareBagOfTasks(content);
-                        job.SubmitTasks();
+                        Job job = JsonConvert.DeserializeObject<Job>(data);
+                        job.SubmitJob();
                     }
                     catch (Exception e)
                     {
@@ -139,16 +139,16 @@ namespace ExcelCloudServer
             }
         }
 
-        public void Send(Socket handler, String data)
+        public static void Send(String data)
         {
             // Convert the string data to byte data using ASCII encoding
             byte[] byteData = Encoding.ASCII.GetBytes(data);
 
             // Being sending bytes to the client
-            handler.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallBack), handler);
+            state.workSocket.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallBack), state.workSocket);
         }
 
-        private void SendCallBack(IAsyncResult ar)
+        private static void SendCallBack(IAsyncResult ar)
         {
             try
             {
