@@ -14,6 +14,7 @@ using Aneka.Tasks;
 using Aneka.Entity;
 using Aneka.Security;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace ExcelCloudServer
 {
@@ -122,6 +123,12 @@ namespace ExcelCloudServer
 
                     foreach (KeyValuePair<string, string> taskFile in taskFiles)
                     {
+                        if(!File.Exists(serverDetails["libraryDir"] + "/" + taskFile.Key))
+                        {
+                            AsyncConnection.Send("Error encountered - File not found in server");
+                            AsyncConnection.sendDone.WaitOne();
+                            break;
+                        }
                         for (int i = 0; i < numTasks; i++)
                         {
                             args = String.Empty;
