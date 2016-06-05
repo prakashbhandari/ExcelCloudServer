@@ -12,7 +12,7 @@ namespace ExcelCloudServer
         /// </summary>
         public int taskID;
 
-        public String task, args;
+        private string task, args;
         public string result;
 
         public AnekaT(String task, String args) { this.task = task; this.args = args; }

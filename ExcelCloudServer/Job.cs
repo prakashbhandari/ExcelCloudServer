@@ -34,7 +34,7 @@ namespace ExcelCloudServer
         /// <summary>
         /// List of all the executable task files
         /// </summary>
-        public IDictionary<string, string> taskFiles = new Dictionary<string, string>();
+        public List<string> taskFiles = new List<string>();
         /// <summary>
         /// Job Execution type: required at server to prepare job arguments
         /// </summary>
@@ -121,10 +121,10 @@ namespace ExcelCloudServer
                     // Initialise taskId to 1.
                     int taskId = 1;
 
-                    foreach (KeyValuePair<string, string> taskFile in taskFiles)
+                    foreach (string taskFile in taskFiles)
                     {
                         string libraryDir = (serverDetails["libraryDir"].Trim().EndsWith(@"\")) ? serverDetails["libraryDir"].Trim(): serverDetails["libraryDir"].Trim() + @"\";
-                        if (!File.Exists(libraryDir + taskFile.Key))
+                        if (!File.Exists(libraryDir + taskFile))
                         {
                             AsyncConnection.Send("Error encountered - File not found in server");
                             AsyncConnection.sendDone.WaitOne();
@@ -140,7 +140,7 @@ namespace ExcelCloudServer
                             }
                             
                             //Create instance of ITask 
-                            AnekaT anekaExecutor = new AnekaT(libraryDir + taskFile.Key, args);
+                            AnekaT anekaExecutor = new AnekaT(libraryDir + taskFile, args);
 
                             anekaExecutor.taskID = taskId;
                             // Add the task to work unit
@@ -178,10 +178,10 @@ namespace ExcelCloudServer
             {
                 // Similar to Aneka executa all the tasks 
                 int taskId = 1;
-                foreach (KeyValuePair<string, string> taskFile in taskFiles)
+                foreach (string taskFile in taskFiles)
                 {
                     string libraryDir = (serverDetails["libraryDir"].Trim().EndsWith(@"\")) ? serverDetails["libraryDir"].Trim() : serverDetails["libraryDir"].Trim() + @"\";
-                    if (!File.Exists(libraryDir + taskFile.Key))
+                    if (!File.Exists(libraryDir + taskFile))
                     {
                         AsyncConnection.Send("Error encountered - File not found in server");
                         AsyncConnection.sendDone.WaitOne();
@@ -195,8 +195,8 @@ namespace ExcelCloudServer
                             args += (jobExecution.Equals("Row based")) ? inputDatas[(i * numParams) + j] + " " : inputDatas[(j * numTasks) + i] + " ";
                         }
 
-                        Debug.WriteLine("Running task:" + taskFile.Key);
-                        CustomTask taskExecutor = new CustomTask(libraryDir + taskFile.Key, args);
+                        Debug.WriteLine("Running task:" + taskFile);
+                        CustomTask taskExecutor = new CustomTask(libraryDir + taskFile, args);
                         taskExecutor.taskID = taskId;
                         taskExecutor.Execute();
                         taskId++;
