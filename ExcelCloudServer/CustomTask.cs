@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 namespace ExcelCloudServer
 {
     [Serializable]
-    public class TaskExecutor
+    public class CustomTask
     {
         /// <summary>
         /// Gets, sets the task ID for each execution
@@ -15,7 +15,7 @@ namespace ExcelCloudServer
         public String task, args;
         public string result;
 
-        public TaskExecutor(String task, String args) { this.task = task; this.args = args; }
+        public CustomTask(String task, String args) { this.task = task; this.args = args; }
 
         public void Execute()
         {

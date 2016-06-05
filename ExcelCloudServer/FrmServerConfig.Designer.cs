@@ -115,7 +115,7 @@
             this.serverStop.UseVisualStyleBackColor = true;
             this.serverStop.Click += new System.EventHandler(this.serverStop_Click);
             // 
-            // Form1
+            // FrmServerConfig
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -128,7 +128,7 @@
             this.Controls.Add(this.hostIP);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Name = "Form1";
+            this.Name = "FrmServerConfig";
             this.Text = "Excel Cloud Server";
             ((System.ComponentModel.ISupportInitialize)(this.servicePort)).EndInit();
             this.ResumeLayout(false);

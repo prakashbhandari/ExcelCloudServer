@@ -1,4 +1,11 @@
-﻿using System;
+﻿//Title        :  AsyncConnection.cs
+//Package      :  ExcelCloudServer
+//Project      :  ExcelCloud
+//Description  :  Provides connection to server, to send and receive data.
+//Created on   :  June 5, 2016
+//Author	   :  Prakash Bhandari
+
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -8,39 +15,66 @@ using System.Diagnostics;
 
 namespace ExcelCloudServer
 {
+    /// <summary>
+    /// Class AsyncConnection: Provides an asynchronous Socket
+    /// connection to server for sending and receiving data
+    /// </summary>
     public class AsyncConnection
     {
-        private String host;
+        /// <summary>
+        /// Server's ip address
+        /// </summary>
+        private string host;
+        /// <summary>
+        /// Port server will be listening to
+        /// </summary>
         private int port;
+        /// <summary>
+        /// reset event to signal once connection is done
+        /// </summary>
         protected static ManualResetEvent connectDone = new ManualResetEvent(false);
+        /// <summary>
+        /// reset event to signal once sending is done
+        /// </summary>
         public static ManualResetEvent sendDone = new ManualResetEvent(false);
+        /// <summary>
+        /// reset event to signal once receiving is done
+        /// </summary>
         protected static ManualResetEvent receiveDone = new ManualResetEvent(false);
-
-        public static StateObject state = new StateObject();
+        /// <summary>
+        /// request received from server
+        /// </summary>
         private static String content = String.Empty;
+        /// <summary>
+        /// hold the instance of socket
+        /// </summary>
         private static Socket listener;
+        /// <summary>
+        /// Sets connection status to true if connected to server
+        /// </summary>
         public volatile bool listening = true;
+        public static StateObject state = new StateObject();
 
+        /// <summary>
+        /// Initialise the class with host and port
+        /// </summary>
+        /// <param name="host">Server's ip address</param>
+        /// <param name="port">Socket open port</param>
         public AsyncConnection(String host, int port)
         {
             this.host = host;
             this.port = port;
         }
 
+        /// <summary>
+        /// Check if the socket can be opened in the given port
+        /// </summary>
+        /// <returns>Bool: True if port is available else false</returns>
         public bool IsPortAvailable()
         {
             IPAddress ipAddress = IPAddress.Parse(this.host);
             try
             {
-                /*IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-                IPAddress ipAddress = null;
-                foreach (IPAddress ip in ipHostInfo.AddressList)
-                {
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        ipAddress = ip;
-                    }
-                }*/
 
                 // Check if port is available if so start the server
 
@@ -59,6 +93,9 @@ namespace ExcelCloudServer
             return false;
         }
 
+        /// <summary>
+        /// Start listening at the specified host and port
+        /// </summary>
         public void StartListening()
         {
             byte[] bytes = new byte[256];
@@ -84,6 +121,10 @@ namespace ExcelCloudServer
             }
         }
 
+        /// <summary>
+        /// If connection is made start accpeting jobs
+        /// </summary>
+        /// <param name="ar"></param>
         public static void AcceptCallBack(IAsyncResult ar)
         {
             try
@@ -104,6 +145,10 @@ namespace ExcelCloudServer
             }
         }
 
+        /// <summary>
+        /// Receives the job description and initialises the job class
+        /// </summary>
+        /// <param name="ar"></param>
         private static void ReadCallBack(IAsyncResult ar)
         {
             StateObject state = (StateObject)ar.AsyncState;
@@ -115,6 +160,7 @@ namespace ExcelCloudServer
             if (bytesRead > 0)
             {
                 state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
+                // All data has been recieved process the job now
                 if (state.sb.ToString().IndexOf("EOF") > -1)
                 {
                     content = state.sb.ToString();
@@ -125,7 +171,7 @@ namespace ExcelCloudServer
                     try
                     {
                         Job job = JsonConvert.DeserializeObject<Job>(data);
-                        job.SubmitJob();
+                        job.SubmitTasks();
                     }
                     catch (Exception e)
                     {
@@ -134,12 +180,17 @@ namespace ExcelCloudServer
                 }
                 else
                 {
+                    // Keep reading data until EOF is received signalling all data sent
                     handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0, new AsyncCallback(ReadCallBack), state);
                 }
             }
         }
 
-        public static void Send(String data)
+        /// <summary>
+        /// Send data string to the connected client
+        /// </summary>
+        /// <param name="data">string: data to be sent</param>
+        public static void Send(string data)
         {
             // Convert the string data to byte data using ASCII encoding
             byte[] byteData = Encoding.ASCII.GetBytes(data);
@@ -148,6 +199,10 @@ namespace ExcelCloudServer
             state.workSocket.BeginSend(byteData, 0, byteData.Length, 0, new AsyncCallback(SendCallBack), state.workSocket);
         }
 
+        /// <summary>
+        /// end sending all data and signal data sent
+        /// </summary>
+        /// <param name="ar"></param>
         private static void SendCallBack(IAsyncResult ar)
         {
             try
@@ -158,6 +213,7 @@ namespace ExcelCloudServer
                 // Complete sending data to client
                 int bytesSent = handler.EndSend(ar);
                 Debug.WriteLine("Sent " + bytesSent.ToString() + " bytes to client");
+                // Signal data sending completed
                 sendDone.Set();
             }
             catch (Exception e)
@@ -166,9 +222,13 @@ namespace ExcelCloudServer
             }
         }
 
+        /// <summary>
+        /// Stop listening at the host and port specified
+        /// </summary>
         public void StopListening()
         {
             this.listening = false;
+            // Signal ready fro new connection
             connectDone.Set();
         }
     }
