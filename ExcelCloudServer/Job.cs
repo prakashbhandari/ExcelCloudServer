@@ -123,7 +123,8 @@ namespace ExcelCloudServer
 
                     foreach (KeyValuePair<string, string> taskFile in taskFiles)
                     {
-                        if(!File.Exists(serverDetails["libraryDir"] + "/" + taskFile.Key))
+                        string libraryDir = (serverDetails["libraryDir"].Trim().EndsWith(@"\")) ? serverDetails["libraryDir"].Trim(): serverDetails["libraryDir"].Trim() + @"\";
+                        if (!File.Exists(libraryDir + taskFile.Key))
                         {
                             AsyncConnection.Send("Error encountered - File not found in server");
                             AsyncConnection.sendDone.WaitOne();
@@ -139,7 +140,7 @@ namespace ExcelCloudServer
                             }
                             
                             //Create instance of ITask 
-                            AnekaT anekaExecutor = new AnekaT(serverDetails["libraryDir"] + "/" + taskFile.Key, args);
+                            AnekaT anekaExecutor = new AnekaT(libraryDir + taskFile.Key, args);
 
                             anekaExecutor.taskID = taskId;
                             // Add the task to work unit
@@ -179,6 +180,13 @@ namespace ExcelCloudServer
                 int taskId = 1;
                 foreach (KeyValuePair<string, string> taskFile in taskFiles)
                 {
+                    string libraryDir = (serverDetails["libraryDir"].Trim().EndsWith(@"\")) ? serverDetails["libraryDir"].Trim() : serverDetails["libraryDir"].Trim() + @"\";
+                    if (!File.Exists(libraryDir + taskFile.Key))
+                    {
+                        AsyncConnection.Send("Error encountered - File not found in server");
+                        AsyncConnection.sendDone.WaitOne();
+                        break;
+                    }
                     for (int i = 0; i < numTasks; i++)
                     {
                         args = String.Empty;
@@ -188,7 +196,7 @@ namespace ExcelCloudServer
                         }
 
                         Debug.WriteLine("Running task:" + taskFile.Key);
-                        CustomTask taskExecutor = new CustomTask(serverDetails["libraryDir"] + "/" + taskFile.Key, args);
+                        CustomTask taskExecutor = new CustomTask(libraryDir + taskFile.Key, args);
                         taskExecutor.taskID = taskId;
                         taskExecutor.Execute();
                         taskId++;
